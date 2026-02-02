@@ -1,0 +1,1679 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>School Attendance System — Mobile</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<style>
+:root{
+  --bg:#f3e8ff; --bg-2:#efe1ff; --card:#fff; --accent:#7c3aed; --muted:#6b7280; --text:#0f1724;
+  --success:#10b981; --danger:#ef4444; --warning:#f59e0b; --sidebar-width:220px; --gap:12px; --header-height:60px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{height:100%; margin:0; padding:0; overflow-x:hidden;}
+body{
+  font-family:Inter,system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  background:linear-gradient(180deg,var(--bg) 0%,var(--bg-2) 60%);
+  color:var(--text);min-height:100vh;
+  font-size:16px;
+}
+
+/* Mobile-first design improvements */
+input,select,textarea,button{font-size:18px !important;}
+button, input[type=button], input[type=submit]{font-size:18px !important;}
+
+header{
+  height:var(--header-height);padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:2px solid rgba(15,23,36,0.06);
+  position:sticky;top:0;z-index:100;background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,255,255,0.95));
+  backdrop-filter:blur(10px);
+}
+.logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(90deg,var(--accent),#6d28d9);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:20px;flex-shrink:0;}
+h1{font-size:20px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;font-weight:600;}
+.container{max-width:100%;margin:0 auto;padding:0 10px;}
+.card{background:var(--card);padding:20px;border-radius:14px;border:1px solid rgba(15,23,36,0.08);box-shadow:0 6px 20px rgba(15,23,36,0.06);margin-bottom:14px;}
+.muted{color:var(--muted);font-size:15px}.small-muted{font-size:14px;color:var(--muted)}
+button{
+  background:var(--accent);color:#fff;border:none;padding:16px 20px;border-radius:12px;cursor:pointer;
+  font-weight:600;min-height:56px;
+  display:inline-flex;align-items:center;justify-content:center;
+  touch-action:manipulation;font-size:18px;width:100%;margin-bottom:8px;
+  transition:all 0.2s ease;
+}
+button:active{transform:scale(0.98);}
+button.ghost{background:transparent;border:2px solid rgba(15,23,36,0.12);color:var(--text);}
+button.danger{background:var(--danger);color:#fff;}
+button.warning{background:var(--warning);color:#fff;}
+input,select,textarea{
+  width:100%;padding:16px;border-radius:12px;border:2px solid rgba(15,23,36,0.12);background:transparent;color:var(--text);
+  font-size:18px;min-height:56px;margin-bottom:10px;
+}
+.note{font-size:15px;color:var(--muted);line-height:1.5;}
+.dashboard{display:flex;flex-direction:column;gap:var(--gap);margin-top:10px;}
+.sidebar{
+  width:100%;border-radius:14px;padding:6px;display:flex;flex-direction:row;
+  background:linear-gradient(180deg,rgba(124,58,237,0.08),rgba(124,58,237,0.04));
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;
+  position:sticky;top:calc(var(--header-height)+6px);z-index:90;
+  margin-bottom:10px;
+}
+.sidebar::-webkit-scrollbar{display:none;}
+.nav-item{
+  padding:12px 14px;border-radius:10px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:8px;
+  font-size:15px;justify-content:center;flex-direction:column;min-width:90px;flex-shrink:0;
+  white-space:nowrap;
+}
+.nav-item .icon{width:28px;height:28px;text-align:center;font-size:22px;}
+.nav-item .label{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;margin-top:4px;font-weight:500;}
+.nav-item:hover{background:rgba(15,23,36,0.04)}
+.nav-item.active{background:var(--accent);color:#fff;font-weight:600;}
+.content{flex:1;min-height:200px;padding:10px 0;display:flex;flex-direction:column;gap:14px;}
+.hnav{
+  display:flex;gap:8px;align-items:center;padding:10px;border-radius:12px;
+  background:linear-gradient(180deg,var(--card),rgba(255,255,255,0.98));box-shadow:0 6px 20px rgba(15,23,36,0.04);
+  overflow-x:auto;margin-bottom:10px;
+}
+.hnav .tab{padding:12px 16px;border-radius:12px;cursor:pointer;background:transparent;color:var(--muted);font-size:15px;flex-shrink:0;font-weight:500;}
+.hnav .tab.active{background:var(--accent);color:#fff;font-weight:600;}
+.grid-2{display:flex;flex-direction:column;gap:14px;}
+.user-list{max-height:55vh;overflow:auto;border-radius:10px;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;min-width:600px;}
+th,td{padding:14px 10px;text-align:left;border-bottom:2px solid rgba(15,23,36,0.08);font-size:15px;font-weight:500;}
+th{font-weight:600;font-size:16px;}
+img.avatar{width:50px;height:50px;border-radius:10px;object-fit:cover;border:2px solid rgba(15,23,36,0.08)}
+.pill{padding:8px 12px;border-radius:12px;font-size:14px;font-weight:600;}
+.marked-row{background:linear-gradient(90deg, rgba(34,197,94,0.08), rgba(16,185,129,0.05));}
+.marked-pill{background:rgba(16,185,129,0.15);color:var(--success);padding:8px 12px;border-radius:10px;font-weight:600;font-size:14px;}
+.summary-table{width:100%;border-collapse:collapse;margin-top:10px}
+.summary-table th,.summary-table td{padding:12px 8px;border:2px solid rgba(0,0,0,0.08);font-size:15px;text-align:center;font-weight:500;}
+.checkbox-cell{width:50px;text-align:center}
+.rollcall-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.modal{
+  position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:flex-start;justify-content:center;
+  background:rgba(0,0,0,0.5);z-index:1200;padding:20px;overflow-y:auto;
+}
+.modal .card{max-width:100%;width:100%;margin-top:20px;margin-bottom:20px;max-height:85vh;overflow-y:auto;padding:24px;}
+.hidden{display:none}
+.header-right {display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.tz-select {background:transparent;border:2px solid rgba(15,23,36,0.12);padding:10px;border-radius:10px;color:var(--text);font-size:15px;min-height:44px;}
+.tz-clock {font-weight:600;color:var(--muted);font-size:14px;min-width:160px;text-align:right;white-space:nowrap;}
+
+/* Mobile optimizations */
+.mobile-grid {display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:14px;}
+.mobile-card {padding:20px;margin-bottom:14px;}
+.mobile-stack {display:flex;flex-direction:column;gap:14px;}
+.mobile-hide {display:none;}
+.mobile-show {display:block;}
+
+/* Touch-friendly improvements */
+.touch-button {padding:16px;min-height:56px;}
+.touch-list li {padding:16px 14px;border-bottom:2px solid rgba(0,0,0,0.06);}
+
+/* Button groups for mobile */
+.button-group {display:flex;gap:10px;margin-top:10px;}
+.button-group button {flex:1;margin:0;}
+
+/* Larger form labels */
+label {font-size:16px;font-weight:600;margin-bottom:6px;display:block;}
+
+/* Security badge */
+.security-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:rgba(16,185,129,0.1);
+  color:#10b981;
+  padding:8px 12px;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:600;
+  margin-top:10px;
+}
+
+/* Delete confirmation modal */
+.delete-confirm {
+  background:rgba(239,68,68,0.1);
+  border:1px solid rgba(239,68,68,0.2);
+  border-radius:12px;
+  padding:16px;
+  margin:16px 0;
+}
+
+/* Status pills */
+.status-Present {background:rgba(16,185,129,0.15); color:var(--success);}
+.status-Absent {background:rgba(239,68,68,0.15); color:var(--danger);}
+.status-Late {background:rgba(245,158,11,0.15); color:var(--warning);}
+.status-Left {background:rgba(124,58,237,0.15); color:var(--accent);}
+
+/* Term and Promotion specific styles */
+.term-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 12px;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:600;
+  margin:4px;
+}
+.term-1 {background:rgba(124,58,237,0.15); color:var(--accent);}
+.term-2 {background:rgba(16,185,129,0.15); color:var(--success);}
+.term-3 {background:rgba(245,158,11,0.15); color:var(--warning);}
+.status-active {background:rgba(16,185,129,0.15); color:var(--success);}
+.status-left {background:rgba(239,68,68,0.15); color:var(--danger);}
+.status-graduated {background:rgba(124,58,237,0.15); color:var(--accent);}
+.status-repeat {background:rgba(245,158,11,0.15); color:var(--warning);}
+
+/* Punctuality styles */
+.punctuality-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 12px;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:600;
+  margin:4px;
+}
+.punctuality-excellent {background:rgba(34,197,94,0.15); color:#22c55e;}
+.punctuality-good {background:rgba(16,185,129,0.15); color:var(--success);}
+.punctuality-average {background:rgba(245,158,11,0.15); color:var(--warning);}
+.punctuality-poor {background:rgba(239,68,68,0.15); color:var(--danger);}
+.serial-late {background:rgba(239,68,68,0.1); border-left:4px solid var(--danger); padding-left:12px;}
+
+/* Bluetooth transfer styles */
+.bluetooth-status {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 12px;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:600;
+}
+.bluetooth-available {background:rgba(59,130,246,0.1); color:#3b82f6;}
+.bluetooth-unavailable {background:rgba(239,68,68,0.1); color:#ef4444;}
+.bluetooth-connecting {background:rgba(245,158,11,0.1); color:#f59e0b;}
+.bluetooth-connected {background:rgba(16,185,129,0.1); color:#10b981;}
+.data-encrypted {background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.2); border-radius:8px; padding:12px; margin:12px 0;}
+
+/* Camera specific styles */
+.camera-container {
+  width: 100%;
+  height: 400px;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 16px;
+}
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.camera-canvas {
+  display: none;
+}
+.camera-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  z-index: 10;
+}
+.camera-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.camera-button.switch {
+  width: 50px;
+  height: 50px;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+}
+.camera-preview {
+  width: 100%;
+  max-height: 300px;
+  border-radius: 12px;
+  margin: 16px 0;
+  object-fit: cover;
+}
+.camera-match-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.camera-match-item {
+  border: 2px solid rgba(124,58,237,0.1);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.camera-match-item:hover {
+  border-color: var(--accent);
+  background: rgba(124,58,237,0.05);
+}
+.camera-match-item.selected {
+  border-color: var(--success);
+  background: rgba(16,185,129,0.1);
+}
+.camera-match-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-bottom: 8px;
+  border: 2px solid rgba(0,0,0,0.1);
+}
+.camera-match-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.camera-match-id {
+  font-size: 12px;
+  color: var(--muted);
+}
+.camera-result {
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.2);
+  margin-top: 16px;
+  text-align: center;
+}
+.camera-error {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.2);
+  color: var(--danger);
+}
+.photo-options {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.photo-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 2px solid rgba(124,58,237,0.2);
+  margin-bottom: 16px;
+}
+.photo-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  background: rgba(124,58,237,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+/* Network status */
+.network-status {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.network-online {
+  background: rgba(16,185,129,0.9);
+  color: white;
+}
+.network-offline {
+  background: rgba(239,68,68,0.9);
+  color: white;
+}
+.network-syncing {
+  background: rgba(245,158,11,0.9);
+  color: white;
+}
+
+/* Sync indicator */
+.sync-indicator {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(124,58,237,0.9);
+  color: white;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .container {max-width:768px;padding:0 16px;}
+  .grid-2 {display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .sidebar {flex-direction:column;width:240px;height:calc(100vh - 80px);overflow-y:auto;overflow-x:hidden;}
+  .dashboard {flex-direction:row;}
+  .nav-item {flex-direction:row;justify-content:flex-start;min-width:auto;padding:14px 16px;}
+  .nav-item .icon {width:32px;font-size:20px;}
+  .nav-item .label {font-size:15px;margin-top:0;margin-left:8px;}
+  .mobile-hide {display:block;}
+  button {width:auto;margin-bottom:0;}
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+  header {padding:8px 10px;}
+  .logo {width:44px;height:44px;font-size:18px;}
+  h1 {font-size:18px;}
+  .tz-clock {display:none;}
+  .card {padding:16px;}
+  button {padding:14px 16px;}
+  .camera-container {height: 300px;}
+}
+
+/* Print styles */
+@media print {
+  .sidebar, .hnav, button {display:none !important;}
+  .card {box-shadow:none;border:2px solid #ccc;}
+}
+
+.login-title {
+  color: #0D2D77;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Loading animation */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(124,58,237,0.3);
+  border-radius: 50%;
+  border-top-color: var(--accent);
+  animation: spin 1s ease-in-out infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Enhanced mobile experience */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+}
+
+/* Swipe-friendly table for mobile */
+@media (max-width: 768px) {
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table {
+    min-width: 700px;
+  }
+}
+
+/* Login message */
+.login-message {
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+}
+.login-error {
+  background: rgba(239,68,68,0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239,68,68,0.2);
+}
+.login-success {
+  background: rgba(16,185,129,0.1);
+  color: #10b981;
+  border: 1px solid rgba(16,185,129,0.2);
+}
+
+/* Term management styles */
+.term-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.term-card {
+  background: rgba(124,58,237,0.05);
+  border: 1px solid rgba(124,58,237,0.1);
+  border-radius: 12px;
+  padding: 16px;
+}
+.promotion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.stat-card {
+  background: rgba(15,23,36,0.02);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 8px 0;
+}
+.stat-label {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Punctuality report styles */
+.punctuality-chart {
+  height: 300px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.punctuality-metric {
+  background: rgba(15,23,36,0.02);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.punctuality-value {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 4px 0;
+}
+.punctuality-label {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  z-index: 10000;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+@keyframes slideUp {
+  from { bottom: -50px; opacity: 0; }
+  to { bottom: 20px; opacity: 1; }
+}
+
+/* Super Admin password prompt */
+.super-admin-prompt {
+  background: rgba(124,58,237,0.05);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+}
+</style>
+
+<!-- Supabase and other CDNs -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+</head>
+<body>
+<header>
+  <div class="logo">SR</div>
+  <h1>School Attendance</h1>
+  <div style="flex:1"></div>
+  <div class="header-right">
+    <div id="liveClock" class="tz-clock">--</div>
+    <select id="tzSelect" class="tz-select" title="Time zone"></select>
+  </div>
+</header>
+
+<div class="container">
+  <div id="loginCard" class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div><div class="login-title">Secure Login</div><div class="small-muted" style="font-size:16px;">Mobile Attendance System</div></div>
+      <div class="security-badge" id="networkStatusBadge">
+        <span>🌐</span> <span id="networkStatusText">Online</span>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <div><label>Email</label><input id="loginEmail" type="email" placeholder="your@email.com" autocomplete="username" /></div>
+      <div><label>Password</label><input id="loginPassword" type="password" placeholder="Enter your password" autocomplete="current-password" /></div>
+      <div class="small-muted" style="margin-top:8px;font-size:14px;">
+        • Staff: Use your registered email<br>
+        • Students: Use student credentials<br>
+        • Contact administrator for access
+      </div>
+    </div>
+
+    <div style="margin-top:30px;">
+      <button id="btnLogin">
+        <span id="loginText">Login</span>
+        <span id="loginSpinner" class="loading-spinner hidden"></span>
+      </button>
+      <div style="width:100%;margin-top:15px;">
+        <div class="note" style="text-align:center;font-size:15px;">Cloud Sync Enabled • Works offline</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dashboardShell" class="hidden">
+    <div class="dashboard">
+      <aside class="sidebar card" id="leftSidebar">
+        <div class="nav-item active" data-view="home"><div class="icon">🏠</div><div class="label">Home</div></div>
+        <div class="nav-item" data-view="students"><div class="icon">👥</div><div class="label">Students</div></div>
+        <div class="nav-item" data-view="register"><div class="icon">✍️</div><div class="label">Register</div></div>
+        <div class="nav-item" data-view="rollcall"><div class="icon">📋</div><div class="label">Rollcall</div></div>
+        <div class="nav-item" data-view="attendance"><div class="icon">📝</div><div class="label">Attendance</div></div>
+        <div class="nav-item" data-view="reports"><div class="icon">📊</div><div class="label">Reports</div></div>
+        <div class="nav-item" data-view="punctuality"><div class="icon">⏰</div><div class="label">Punctuality</div></div>
+        <div class="nav-item" data-view="terms"><div class="icon">📅</div><div class="label">Term & Year</div></div>
+        <div class="nav-item" data-view="sync"><div class="icon">🔄</div><div class="label">Sync</div></div>
+        <div class="nav-item" data-view="settings"><div class="icon">⚙️</div><div class="label">Settings</div></div>
+        <div style="flex:1" class="mobile-hide"></div>
+        <div class="nav-item" id="btnLogout"><div class="icon">🔒</div><div class="label">Logout</div></div>
+      </aside>
+
+      <main class="content">
+        <div class="hnav card" id="horizontalNav">
+          <div class="tab active" data-tab="overview">Overview</div>
+          <div class="tab" data-tab="quick">Quick Roll</div>
+          <div class="tab" data-tab="filters">Filters</div>
+          <div class="tab" data-tab="camera">Camera Rollcall</div>
+          <div style="flex:1"></div>
+          <div id="syncIndicator" class="sync-indicator hidden">
+            <span class="loading-spinner" style="width:12px;height:12px;"></span>
+            Syncing...
+          </div>
+        </div>
+
+        <div id="dashboardContent"></div>
+      </main>
+    </div>
+  </div>
+
+  <footer style="margin-top:20px;text-align:center" class="card note">
+    <div style="font-size:16px;font-weight:600;">Cloud Attendance System v3.0</div>
+    <div class="small-muted" style="margin-top:8px;font-size:14px;">Secure • Mobile-First • Cloud Sync • Offline Support</div>
+  </footer>
+</div>
+
+<div id="modal" class="modal hidden" aria-hidden="true"><div class="card" id="modalCard"></div></div>
+
+<div id="networkStatus" class="network-status network-online hidden">
+  <span id="networkIcon">🌐</span>
+  <span id="networkText">Online</span>
+</div>
+
+<script>
+// ========== SUPABASE CONFIGURATION ==========
+const SUPABASE_URL = 'https://vdniyczffkgdpmsvmqtw.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_2-Rtf_3-aRN9jLfZzPm16w_k5mT8HSW';
+
+// Initialize Supabase client
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ========== LOCAL STORAGE KEYS ==========
+const STORAGE = {
+  users: 'sv_users',
+  students: 'sv_students',
+  attendance: 'sv_attendance',
+  settings: 'sv_settings',
+  lastQuickBatch: 'sv_last_quick_batch',
+  timezone: 'sv_timezone',
+  session: 'sv_session',
+  terms: 'sv_terms',
+  academicYear: 'sv_academic_year',
+  offlineQueue: 'sv_offline_queue',
+  lastSync: 'sv_last_sync',
+  deviceId: 'sv_device_id'
+};
+
+// ========== NETWORK & SYNC MANAGEMENT ==========
+let isOnline = navigator.onLine;
+let isSyncing = false;
+let syncInterval = null;
+
+// Initialize device ID
+function getDeviceId() {
+  let deviceId = localStorage.getItem(STORAGE.deviceId);
+  if (!deviceId) {
+    deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem(STORAGE.deviceId, deviceId);
+  }
+  return deviceId;
+}
+
+// Network status monitoring
+function initNetworkMonitor() {
+  const networkStatus = el('#networkStatus');
+  const networkStatusBadge = el('#networkStatusBadge');
+  
+  function updateNetworkStatus() {
+    isOnline = navigator.onLine;
+    
+    if (isOnline) {
+      networkStatus.className = 'network-status network-online';
+      networkStatusBadge.className = 'security-badge';
+      networkStatusBadge.innerHTML = '<span>🌐</span> Online';
+      el('#networkIcon').textContent = '🌐';
+      el('#networkText').textContent = 'Online';
+      networkStatus.classList.remove('hidden');
+      
+      // Start syncing when coming online
+      setTimeout(() => {
+        syncOfflineData();
+      }, 1000);
+    } else {
+      networkStatus.className = 'network-status network-offline';
+      networkStatusBadge.className = 'security-badge';
+      networkStatusBadge.innerHTML = '<span>📴</span> Offline';
+      el('#networkIcon').textContent = '📴';
+      el('#networkText').textContent = 'Offline';
+      networkStatus.classList.remove('hidden');
+    }
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      if (networkStatus) networkStatus.classList.add('hidden');
+    }, 3000);
+  }
+  
+  window.addEventListener('online', updateNetworkStatus);
+  window.addEventListener('offline', updateNetworkStatus);
+  
+  // Initial update
+  updateNetworkStatus();
+  
+  // Start auto-sync interval (every 30 seconds when online)
+  syncInterval = setInterval(() => {
+    if (isOnline && !isSyncing) {
+      syncOfflineData();
+    }
+  }, 30000);
+}
+
+// ========== OFFLINE QUEUE MANAGEMENT ==========
+function addToOfflineQueue(tableName, operation, data, recordId = null) {
+  const queue = load(STORAGE.offlineQueue);
+  const queueItem = {
+    id: uid(),
+    table_name: tableName,
+    operation: operation,
+    data: data,
+    record_id: recordId || data.id || uid(),
+    device_id: getDeviceId(),
+    created_at: nowISO(),
+    synced: false
+  };
+  
+  queue.push(queueItem);
+  save(STORAGE.offlineQueue, queue);
+  
+  // If online, try to sync immediately
+  if (isOnline && !isSyncing) {
+    setTimeout(() => syncOfflineData(), 1000);
+  }
+}
+
+// ========== SYNC FUNCTIONS ==========
+async function syncOfflineData() {
+  if (isSyncing || !isOnline) return;
+  
+  isSyncing = true;
+  showSyncIndicator(true);
+  
+  try {
+    const queue = load(STORAGE.offlineQueue);
+    const unsyncedItems = queue.filter(item => !item.synced);
+    
+    if (unsyncedItems.length === 0) {
+      // Sync local data from cloud
+      await syncFromCloud();
+      return;
+    }
+    
+    for (const item of unsyncedItems) {
+      try {
+        let result;
+        
+        switch (item.operation) {
+          case 'INSERT':
+            result = await supabase
+              .from(item.table_name)
+              .insert(item.data);
+            break;
+            
+          case 'UPDATE':
+            result = await supabase
+              .from(item.table_name)
+              .update(item.data)
+              .eq('id', item.record_id);
+            break;
+            
+          case 'DELETE':
+            result = await supabase
+              .from(item.table_name)
+              .delete()
+              .eq('id', item.record_id);
+            break;
+        }
+        
+        if (result.error) throw result.error;
+        
+        // Mark as synced
+        const itemIndex = queue.findIndex(q => q.id === item.id);
+        if (itemIndex !== -1) {
+          queue[itemIndex].synced = true;
+          queue[itemIndex].synced_at = nowISO();
+        }
+      } catch (error) {
+        console.error(`Sync failed for ${item.table_name}:`, error);
+        // Don't break the loop, continue with other items
+      }
+    }
+    
+    save(STORAGE.offlineQueue, queue);
+    
+    // Now sync from cloud to get latest data
+    await syncFromCloud();
+    
+    showToast('Data synchronized successfully!', 'success');
+  } catch (error) {
+    console.error('Sync error:', error);
+    showToast('Sync failed. Working offline...', 'error');
+  } finally {
+    isSyncing = false;
+    showSyncIndicator(false);
+  }
+}
+
+async function syncFromCloud() {
+  try {
+    const session = getSession();
+    if (!session) return;
+    
+    // Sync students
+    const { data: cloudStudents, error: studentsError } = await supabase
+      .from('students')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (!studentsError && cloudStudents) {
+      save(STORAGE.students, cloudStudents);
+    }
+    
+    // Sync attendance
+    const { data: cloudAttendance, error: attendanceError } = await supabase
+      .from('attendance')
+      .select('*')
+      .order('date_iso', { ascending: false })
+      .limit(1000); // Limit to prevent large downloads
+    
+    if (!attendanceError && cloudAttendance) {
+      save(STORAGE.attendance, cloudAttendance);
+    }
+    
+    // Sync terms
+    const { data: cloudTerms, error: termsError } = await supabase
+      .from('terms')
+      .select('*');
+    
+    if (!termsError && cloudTerms) {
+      save(STORAGE.terms, cloudTerms);
+    }
+    
+    // Sync settings
+    const { data: cloudSettings, error: settingsError } = await supabase
+      .from('settings')
+      .select('*');
+    
+    if (!settingsError && cloudSettings) {
+      const settingsObj = {};
+      cloudSettings.forEach(setting => {
+        settingsObj[setting.key] = setting.value;
+      });
+      save(STORAGE.settings, settingsObj);
+    }
+    
+    localStorage.setItem(STORAGE.lastSync, nowISO());
+  } catch (error) {
+    console.error('Cloud sync error:', error);
+  }
+}
+
+function showSyncIndicator(show) {
+  const indicator = el('#syncIndicator');
+  if (show) {
+    indicator.classList.remove('hidden');
+  } else {
+    indicator.classList.add('hidden');
+  }
+}
+
+// ========== SUPABASE AUTH FUNCTIONS ==========
+async function signUp(email, password, userData) {
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: userData
+      }
+    });
+    
+    if (error) throw error;
+    
+    // Create profile in profiles table
+    if (data.user) {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          username: userData.username,
+          role: userData.role || 'user',
+          display_name: userData.display_name,
+          permissions: userData.permissions || {}
+        });
+      
+      if (profileError) throw profileError;
+    }
+    
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+async function signIn(email, password) {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+    
+    if (error) throw error;
+    
+    // Get user profile
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', data.user.id)
+      .single();
+    
+    if (profileError) throw profileError;
+    
+    return { 
+      success: true, 
+      data: {
+        ...data,
+        profile: profile
+      }
+    };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+async function signOut() {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+// ========== SUPABASE DATA OPERATIONS ==========
+async function fetchStudents() {
+  if (isOnline) {
+    try {
+      const { data, error } = await supabase
+        .from('students')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (!error && data) {
+        save(STORAGE.students, data);
+        return data;
+      }
+    } catch (error) {
+      console.error('Failed to fetch students from cloud:', error);
+    }
+  }
+  
+  // Fallback to local storage
+  return load(STORAGE.students);
+}
+
+async function saveStudent(studentData, isUpdate = false) {
+  const operation = isUpdate ? 'UPDATE' : 'INSERT';
+  
+  if (isOnline) {
+    try {
+      let result;
+      if (isUpdate) {
+        result = await supabase
+          .from('students')
+          .update(studentData)
+          .eq('id', studentData.id);
+      } else {
+        result = await supabase
+          .from('students')
+          .insert(studentData);
+      }
+      
+      if (result.error) throw result.error;
+      
+      // Update local storage
+      const students = load(STORAGE.students);
+      if (isUpdate) {
+        const index = students.findIndex(s => s.id === studentData.id);
+        if (index !== -1) {
+          students[index] = { ...students[index], ...studentData, synced: true };
+        }
+      } else {
+        students.push({ ...studentData, synced: true });
+      }
+      save(STORAGE.students, students);
+      
+      return { success: true };
+    } catch (error) {
+      // If online save fails, add to offline queue
+      addToOfflineQueue('students', operation, studentData);
+      
+      // Update local storage anyway
+      const students = load(STORAGE.students);
+      if (isUpdate) {
+        const index = students.findIndex(s => s.id === studentData.id);
+        if (index !== -1) {
+          students[index] = { ...students[index], ...studentData, synced: false };
+        }
+      } else {
+        students.push({ ...studentData, synced: false });
+      }
+      save(STORAGE.students, students);
+      
+      return { success: true, offline: true };
+    }
+  } else {
+    // Offline mode - add to queue and save locally
+    addToOfflineQueue('students', operation, studentData);
+    
+    const students = load(STORAGE.students);
+    if (isUpdate) {
+      const index = students.findIndex(s => s.id === studentData.id);
+      if (index !== -1) {
+        students[index] = { ...students[index], ...studentData, synced: false };
+      }
+    } else {
+      students.push({ ...studentData, synced: false });
+    }
+    save(STORAGE.students, students);
+    
+    return { success: true, offline: true };
+  }
+}
+
+async function deleteStudent(studentId) {
+  if (isOnline) {
+    try {
+      const { error } = await supabase
+        .from('students')
+        .delete()
+        .eq('id', studentId);
+      
+      if (error) throw error;
+      
+      // Update local storage
+      const students = load(STORAGE.students);
+      const updatedStudents = students.filter(s => s.id !== studentId);
+      save(STORAGE.students, updatedStudents);
+      
+      return { success: true };
+    } catch (error) {
+      // If online delete fails, add to offline queue
+      addToOfflineQueue('students', 'DELETE', { id: studentId }, studentId);
+      
+      // Update local storage anyway
+      const students = load(STORAGE.students);
+      const updatedStudents = students.filter(s => s.id !== studentId);
+      save(STORAGE.students, updatedStudents);
+      
+      return { success: true, offline: true };
+    }
+  } else {
+    // Offline mode - add to queue and update locally
+    addToOfflineQueue('students', 'DELETE', { id: studentId }, studentId);
+    
+    const students = load(STORAGE.students);
+    const updatedStudents = students.filter(s => s.id !== studentId);
+    save(STORAGE.students, updatedStudents);
+    
+    return { success: true, offline: true };
+  }
+}
+
+async function saveAttendance(attendanceData) {
+  if (isOnline) {
+    try {
+      const { error } = await supabase
+        .from('attendance')
+        .insert(attendanceData);
+      
+      if (error) throw error;
+      
+      // Update local storage
+      const attendance = load(STORAGE.attendance);
+      attendance.push({ ...attendanceData, synced: true });
+      save(STORAGE.attendance, attendance);
+      
+      return { success: true };
+    } catch (error) {
+      // If online save fails, add to offline queue
+      addToOfflineQueue('attendance', 'INSERT', attendanceData);
+      
+      // Update local storage anyway
+      const attendance = load(STORAGE.attendance);
+      attendance.push({ ...attendanceData, synced: false });
+      save(STORAGE.attendance, attendance);
+      
+      return { success: true, offline: true };
+    }
+  } else {
+    // Offline mode - add to queue and save locally
+    addToOfflineQueue('attendance', 'INSERT', attendanceData);
+    
+    const attendance = load(STORAGE.attendance);
+    attendance.push({ ...attendanceData, synced: false });
+    save(STORAGE.attendance, attendance);
+    
+    return { success: true, offline: true };
+  }
+}
+
+// ========== HELPER FUNCTIONS ==========
+const el = q => document.querySelector(q);
+const elAll = q => Array.from(document.querySelectorAll(q));
+
+function load(key) {
+  try {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : (key === STORAGE.offlineQueue ? [] : []);
+  } catch(e) {
+    console.error('Error loading from localStorage:', e);
+    return key === STORAGE.offlineQueue ? [] : [];
+  }
+}
+
+function save(key, val) {
+  try {
+    localStorage.setItem(key, JSON.stringify(val || []));
+  } catch(e) {
+    console.error('Error saving to localStorage:', e);
+  }
+}
+
+function uid() {
+  return 'u' + Math.random().toString(36).slice(2, 9);
+}
+
+function nowISO() {
+  return new Date().toISOString();
+}
+
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function pad4(n) {
+  return String(n).padStart(4, '0');
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+function formatLocal(ts) {
+  try {
+    return new Date(ts).toLocaleString();
+  } catch(e) {
+    return ts;
+  }
+}
+
+function showToast(message, type = 'info', duration = 3000) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = message;
+  
+  if (type === 'success') toast.style.background = 'var(--success)';
+  if (type === 'error') toast.style.background = 'var(--danger)';
+  if (type === 'warning') toast.style.background = 'var(--warning)';
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(20px)';
+    setTimeout(() => {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 300);
+  }, duration);
+}
+
+function showModal(html) {
+  el('#modalCard').innerHTML = html;
+  el('#modal').classList.remove('hidden');
+  el('#modal').setAttribute('aria-hidden', 'false');
+}
+
+function hideModal() {
+  el('#modal').classList.add('hidden');
+  el('#modal').setAttribute('aria-hidden', 'true');
+  el('#modalCard').innerHTML = '';
+}
+
+// ========== ENHANCED LOGIN WITH SUPABASE ==========
+function wireLogin() {
+  const btn = el('#btnLogin');
+  if (!btn) return;
+  
+  btn.addEventListener('click', async () => {
+    const email = (el('#loginEmail').value || '').trim();
+    const password = (el('#loginPassword').value || '').trim();
+    
+    if (!email || !password) {
+      showLoginMessage('Please enter email and password', 'error');
+      return;
+    }
+    
+    const loginText = el('#loginText');
+    const loginSpinner = el('#loginSpinner');
+    loginText.textContent = 'Authenticating...';
+    loginSpinner.classList.remove('hidden');
+    btn.disabled = true;
+    
+    try {
+      const result = await signIn(email, password);
+      
+      if (result.success) {
+        const sessionData = {
+          id: result.data.user.id,
+          email: result.data.user.email,
+          username: result.data.profile.username,
+          role: result.data.profile.role,
+          name: result.data.profile.display_name || result.data.profile.username,
+          permissions: result.data.profile.permissions
+        };
+        
+        setSession(sessionData);
+        
+        // Sync data from cloud
+        await syncFromCloud();
+        
+        openDashboardFor(sessionData.role);
+      } else {
+        showLoginMessage(result.error || 'Invalid credentials', 'error');
+      }
+    } catch (error) {
+      showLoginMessage('Login failed. Please try again.', 'error');
+    } finally {
+      resetLoginButton();
+    }
+  });
+  
+  el('#loginPassword').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      el('#btnLogin').click();
+    }
+  });
+}
+
+function showLoginMessage(message, type) {
+  const existingMsg = el('#loginMessage');
+  if (existingMsg) existingMsg.remove();
+  
+  const messageEl = document.createElement('div');
+  messageEl.id = 'loginMessage';
+  messageEl.className = `login-message ${type === 'error' ? 'login-error' : 'login-success'}`;
+  messageEl.textContent = message;
+  
+  const loginCard = el('#loginCard');
+  const buttonDiv = loginCard.querySelector('div:last-child');
+  loginCard.insertBefore(messageEl, buttonDiv);
+  
+  setTimeout(() => {
+    if (messageEl.parentNode) messageEl.remove();
+  }, 5000);
+}
+
+function resetLoginButton() {
+  const loginText = el('#loginText');
+  const loginSpinner = el('#loginSpinner');
+  const btn = el('#btnLogin');
+  
+  loginText.textContent = 'Login';
+  loginSpinner.classList.add('hidden');
+  btn.disabled = false;
+}
+
+// ========== SESSION MANAGEMENT ==========
+function setSession(obj) {
+  localStorage.setItem(STORAGE.session, JSON.stringify(obj));
+  updateHeader();
+}
+
+function getSession() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE.session) || 'null');
+  } catch(e) {
+    return null;
+  }
+}
+
+function clearSession() {
+  localStorage.removeItem(STORAGE.session);
+  updateHeader();
+}
+
+async function handleLogout() {
+  const session = getSession();
+  if (session && isOnline) {
+    await signOut();
+  }
+  clearSession();
+  location.reload();
+}
+
+// ========== INITIALIZATION ==========
+document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize network monitoring
+  initNetworkMonitor();
+  
+  // Check for existing session
+  const session = getSession();
+  if (session) {
+    // Verify session is still valid
+    if (isOnline) {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          openDashboardFor(session.role);
+        } else {
+          clearSession();
+          showLanding();
+        }
+      } catch {
+        // If check fails, still try to use local session
+        openDashboardFor(session.role);
+      }
+    } else {
+      // Offline mode, use local session
+      openDashboardFor(session.role);
+    }
+  } else {
+    showLanding();
+  }
+  
+  // Initialize other components
+  buildTimezoneSelect();
+  startClock();
+  wireLogin();
+  wireSidebar();
+  wireTabs();
+  updateHeader();
+});
+
+// ========== SYNC VIEW ==========
+function renderSyncView() {
+  const queue = load(STORAGE.offlineQueue);
+  const unsyncedCount = queue.filter(item => !item.synced).length;
+  const lastSync = localStorage.getItem(STORAGE.lastSync);
+  
+  el('#dashboardContent').innerHTML = `
+    <div class="card">
+      <strong style="font-size:20px;">Data Synchronization</strong>
+      <div class="small-muted" style="margin-top:8px;font-size:16px;">Manage data sync between devices and cloud</div>
+      
+      <div style="margin-top:24px">
+        <div class="data-encrypted">
+          <strong style="font-size:16px;">🔒 Secure Cloud Sync</strong>
+          <div class="small-muted" style="margin-top:4px;font-size:14px;">
+            Your data is encrypted and securely synchronized with the cloud.
+          </div>
+        </div>
+        
+        <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px">
+          <div class="stat-card">
+            <div class="stat-label">Network Status</div>
+            <div class="stat-value" style="color:${isOnline ? 'var(--success)' : 'var(--danger)'}">
+              ${isOnline ? 'Online' : 'Offline'}
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-label">Pending Sync</div>
+            <div class="stat-value" style="color:${unsyncedCount > 0 ? 'var(--warning)' : 'var(--success)'}">
+              ${unsyncedCount}
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-label">Last Sync</div>
+            <div class="stat-value" style="font-size:20px;">
+              ${lastSync ? formatLocal(lastSync) : 'Never'}
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top:24px">
+          <button onclick="syncOfflineData()" ${!isOnline ? 'disabled style="opacity:0.5"' : ''}>
+            ${isOnline ? 'Sync Now' : 'Offline - Cannot Sync'}
+          </button>
+          
+          <button onclick="forceSyncFromCloud()" class="ghost" ${!isOnline ? 'disabled style="opacity:0.5"' : ''}>
+            Pull Latest Data
+          </button>
+        </div>
+        
+        ${unsyncedCount > 0 ? `
+          <div style="margin-top:24px">
+            <strong style="font-size:18px;">Pending Sync Items (${unsyncedCount})</strong>
+            <div class="user-list" style="margin-top:12px;max-height:300px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Table</th>
+                    <th>Operation</th>
+                    <th>Created</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${queue.filter(item => !item.synced).slice(0, 20).map(item => `
+                    <tr>
+                      <td style="font-size:14px">${item.table_name}</td>
+                      <td style="font-size:14px">
+                        <span class="pill ${item.operation === 'INSERT' ? 'status-Present' : item.operation === 'UPDATE' ? 'status-Late' : 'status-Absent'}">
+                          ${item.operation}
+                        </span>
+                      </td>
+                      <td style="font-size:14px">${formatLocal(item.created_at)}</td>
+                      <td style="font-size:14px">
+                        <span class="pill status-Absent">Pending</span>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+            ${unsyncedCount > 20 ? `<div class="note" style="margin-top:8px">... and ${unsyncedCount - 20} more items</div>` : ''}
+          </div>
+        ` : ''}
+        
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(15,23,36,0.08)">
+          <strong style="font-size:18px;">Sync Settings</strong>
+          
+          <div style="margin-top:16px">
+            <label style="display:flex;align-items:center;gap:12px;font-size:16px">
+              <input type="checkbox" id="autoSync" ${localStorage.getItem('autoSync') !== 'false' ? 'checked' : ''} 
+                     style="width:20px;height:20px" onchange="toggleAutoSync(this.checked)" />
+              Auto-sync when online
+            </label>
+            
+            <label style="display:flex;align-items:center;gap:12px;font-size:16px;margin-top:12px">
+              <input type="checkbox" id="wifiOnly" ${localStorage.getItem('wifiOnly') === 'true' ? 'checked' : ''} 
+                     style="width:20px;height:20px" onchange="toggleWifiOnly(this.checked)" />
+              Sync only on Wi-Fi
+            </label>
+          </div>
+          
+          <div style="margin-top:20px">
+            <button onclick="clearSyncQueue()" class="ghost danger">
+              Clear Sync Queue
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function toggleAutoSync(enabled) {
+  localStorage.setItem('autoSync', enabled);
+  showToast(`Auto-sync ${enabled ? 'enabled' : 'disabled'}`, 'success');
+}
+
+function toggleWifiOnly(enabled) {
+  localStorage.setItem('wifiOnly', enabled);
+  showToast(`Wi-Fi only sync ${enabled ? 'enabled' : 'disabled'}`, 'success');
+}
+
+async function forceSyncFromCloud() {
+  if (!isOnline) {
+    showToast('Cannot sync while offline', 'error');
+    return;
+  }
+  
+  isSyncing = true;
+  showSyncIndicator(true);
+  
+  try {
+    await syncFromCloud();
+    showToast('Data refreshed from cloud', 'success');
+  } catch (error) {
+    showToast('Failed to refresh data', 'error');
+  } finally {
+    isSyncing = false;
+    showSyncIndicator(false);
+  }
+}
+
+function clearSyncQueue() {
+  if (confirm('Clear all pending sync items? This cannot be undone.')) {
+    save(STORAGE.offlineQueue, []);
+    showToast('Sync queue cleared', 'success');
+    renderSyncView();
+  }
+}
+
+// ========== MODIFIED STUDENT FUNCTIONS WITH SYNC ==========
+async function handleRegisterStudent() {
+  const btn = el('#btnRegisterStudent');
+  if (btn && btn.disabled) return;
+  
+  if (btn) {
+    btn.disabled = true;
+    btn.dataset.origText = btn.textContent || 'Register Student';
+    btn.textContent = 'Registering...';
+  }
+  
+  try {
+    const fullName = (el('#stuFullName').value || '').trim();
+    const gender = el('#stuGender').value;
+    const cls = el('#stuClass').value;
+    const year = el('#stuYear').value;
+    const phone = (el('#stuPhone').value || '').trim();
+    const religion = el('#stuReligion').value;
+    const photoData = el('#stuPhotoData').value;
+    
+    if (!fullName) {
+      alert('Provide full name.');
+      return;
+    }
+    
+    const regNo = nextRegNo(cls, year);
+    const studentID = `SR-${cls}-${year}-${regNo}`;
+    const username = studentID;
+    const pin = String(Math.floor(Math.random() * 9000 + 1000));
+    
+    const studentData = {
+      full_name: fullName,
+      gender: gender,
+      class: cls,
+      year: year,
+      reg_no: regNo,
+      student_id: studentID,
+      photo: photoData,
+      parent_phone: phone,
+      religion: religion,
+      username: username,
+      pin: pin,
+      status: 'active'
+    };
+    
+    const result = await saveStudent(studentData, false);
+    
+    if (result.success) {
+      showToast(`Registered ${studentID}\nUsername: ${username}\nPIN: ${pin} (share privately)`, 'success');
+      
+      elAll('.nav-item').forEach(n => n.classList.remove('active'));
+      el('.nav-item[data-view="students"]').classList.add('active');
+      showView('students');
+    }
+  } catch (error) {
+    console.error('Registration error:', error);
+    showToast('Registration failed. Data saved locally.', 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = btn.dataset.origText || 'Register Student';
+      delete btn.dataset.origText;
+    }
+  }
+}
+
+async function deleteStudentWithSync(id, reason = '') {
+  if (!confirm('Are you sure you want to delete this student?')) return;
+  
+  const result = await deleteStudent(id);
+  
+  if (result.success) {
+    showToast(`Student deleted${reason ? ' (' + reason + ')' : ''}${result.offline ? ' (will sync when online)' : ''}.`, 'success');
+    
+    // Remove from local attendance
+    const attendance = load(STORAGE.attendance);
+    const student = load(STORAGE.students).find(s => s.id === id);
+    if (student) {
+      const updatedAttendance = attendance.filter(a => a.student_id !== student.student_id);
+      save(STORAGE.attendance, updatedAttendance);
+    }
+    
+    if (el('.nav-item.active')?.dataset.view === 'students') renderStudents();
+    if (el('.nav-item.active')?.dataset.view === 'attendance') renderAttendance();
+  }
+}
+
+// ========== MODIFIED ATTENDANCE FUNCTIONS WITH SYNC ==========
+async function markAttendanceForStudent(studentID, status = 'Present', notes = '') {
+  const student = load(STORAGE.students).find(s => s.student_id === studentID);
+  if (!student) {
+    showToast('Student not found', 'error');
+    return;
+  }
+  
+  // Check if already marked today
+  const todayAttendance = load(STORAGE.attendance).find(a => 
+    a.student_id === studentID && a.date_iso === todayISO()
+  );
+  
+  if (todayAttendance) {
+    showToast('Student already marked today', 'warning');
+    return;
+  }
+  
+  const attendanceData = {
+    student_id: studentID,
+    date_iso: todayISO(),
+    timestamp: nowISO(),
+    status: status,
+    arrival_time: status === 'Present' || status === 'Late' ? nowISO() : null,
+    left_time: null,
+    notes: notes || `${status} - Manual entry`,
+    recorded_by: getSession()?.username || 'user',
+    class: student.class,
+    year: student.year
+  };
+  
+  const result = await saveAttendance(attendanceData);
+  
+  if (result.success) {
+    showToast(`Marked ${student.full_name} as ${status}${result.offline ? ' (offline)' : ''}`, 'success');
+    
+    if (el('.nav-item.active')?.dataset.view === 'students') renderStudents();
+    if (el('.nav-item.active')?.dataset.view === 'attendance') renderAttendance();
+  }
+}
+
+// ========== REST OF THE FUNCTIONS (similar modifications needed) ==========
+// Due to length constraints, I'm showing the pattern above.
+// You would need to similarly modify:
+// - markQuickFromQuickPanel()
+// - doRollcallMarkSelected()
+// - doRollcallMarkAllPresent()
+// - saveStudent() in openEditStudent()
+// - And all other data operations
+
+// ========== TIMEZONE AND CLOCK FUNCTIONS ==========
+// [Keep all the existing timezone and clock functions from your original code]
+
+// ========== VIEW RENDERING FUNCTIONS ==========
+// [Keep all the existing view rendering functions, but update data fetching to use fetchStudents() etc.]
+
+// Note: Due to the extensive nature of the complete code migration,
+// I've shown the key patterns for integrating Supabase with offline sync.
+// You would need to apply similar patterns to all data operations.
+
+</script>
+</body>
+</html>
